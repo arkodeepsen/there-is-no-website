@@ -15,7 +15,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('views'));
 
 const cleanGeneratedCode = (text) => {
     // Remove markdown code blocks if present
