@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>There is no title</title>
+    <link rel="stylesheet" href="/loading.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar glass2">
+        <div class="nav-brand">
+            <i class="fas fa-code"></i>
+            <span>I'm not a frontend developer</span>
+        </div>
+        <div class="nav-links">
+            <a href="https://github.com/arkodeepsen/there-is-no-website" target="_blank" rel="noopener" title="GitHub Repository"><i class="fab fa-github"></i></a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="glass">
+            <h1>There is no website</h1>
+            <div class="input-container">
+                <input type="text" id="prompt" placeholder="unless you want one...">
+                <button type="button" onclick="generateWebsite()">
+                    <i class="fas fa-magic"></i>
+                    Generate
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="loading">
+        <div class="spinner"></div>
+        <p class="status">Generating your unique website...</p>
+    </div>
+    <script>
+        const generateWebsite = async () => {
+            const promptInput = document.getElementById('prompt');
+            if (!promptInput.value.trim()) {
+                alert('Please enter what kind of website you want to generate');
+                return;
+            }
+            const loading = document.querySelector('.loading');
+            const container = document.querySelector('.container');
+            
+            try {
+                loading.style.display = 'flex';
+                // Add small delay to ensure display:flex is applied before adding visible class
+                setTimeout(() => loading.classList.add('visible'), 10);
+                container.style.display = 'none';
+                
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: promptInput.value })
+                });
+                
+                if (!response.ok) throw new Error('Generation failed');
+                const html = await response.text();
+                document.open();
+                document.write(html);
+                document.close();
+            } catch (error) {
+                console.error('Error:', error);
+                loading.classList.remove('visible');
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    container.style.display = 'flex';
+                }, 300);
+                alert('Generation failed. Please try again.');
+            }
+        };
+    </script>
+    <footer class="footer">
+        <p>Powered by <a href="https://gemini.google.com"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Google_Gemini_logo.svg/1200px-Google_Gemini_logo.svg.png" alt="Google Gemini Logo"></a></p>
+        <p>Developed using no code with Claude Sonnet 3.5 by Arkodeep Sen.</p>
+    </footer>
+</body>
+</html>
