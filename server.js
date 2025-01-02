@@ -1,13 +1,17 @@
 import express from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { saveToBackup } from './utils/fileOps.js';
 
+dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const genAI = new GoogleGenerativeAI('AIzaSyB0-CcVUVV8HAo29XO51MgAEG881WFJyOg');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Middleware
 app.use(express.json());
@@ -38,6 +42,26 @@ const logError = (error, context) => {
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'loading.html'));
+});
+
+app.get('/history', async (req, res) => {
+    try {
+        const historyPath = path.join(__dirname, 'data', 'backup.json');
+        let history = [];
+        
+        try {
+            const data = await fs.readFile(historyPath, 'utf8');
+            history = JSON.parse(data);
+        } catch (error) {
+            // If file doesn't exist, create it with empty array
+            await fs.writeFile(historyPath, '[]');
+        }
+        
+        res.json(history);
+    } catch (error) {
+        console.error('History fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch history' });
+    }
 });
 
 app.post('/generate', async (req, res) => {
@@ -128,6 +152,9 @@ app.post('/generate', async (req, res) => {
         if (!website || !website.includes('<html')) {
             throw new Error('Invalid generation: Missing HTML structure');
         }
+
+        // Save to backup
+        await saveToBackup(prompt, website);
 
         res.send(website);
 

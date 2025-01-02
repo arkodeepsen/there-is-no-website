@@ -14,9 +14,23 @@
             <span>I'm not a frontend developer</span>
         </div>
         <div class="nav-links">
+            <!--<a href="javascript:void(0)" onclick="showHistory()" class="history-btn" title="Show History">
+                <i class="fas fa-history"></i>
+            </a>-->
             <a href="https://github.com/arkodeepsen/there-is-no-website" target="_blank" rel="noopener" title="GitHub Repository"><i class="fab fa-github"></i></a>
         </div>
     </nav>
+    <div id="historyModal" class="modal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>Generation History</h2>
+                <a href="javascript:void(0)" onclick="closeHistory()" class="close-btn" title="Close History">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+            <div class="history-list"></div>
+        </div>
+    </div>
     <div class="container">
         <div class="glass">
             <h1>There is no website</h1>
@@ -72,6 +86,51 @@
                 alert('Generation failed. Please try again.');
             }
         };
+    </script>
+    <script>
+    async function showHistory() {
+        const modal = document.getElementById('historyModal');
+        const historyList = document.querySelector('.history-list');
+        
+        try {
+            const response = await fetch('/history');
+            if (!response.ok) throw new Error('Failed to fetch history');
+            
+            const history = await response.json();
+            
+            historyList.innerHTML = history.length ? history.reverse().map(item => `
+                <div class="history-item" onclick="loadHistoryItem('${item.prompt}', ${JSON.stringify(item.website)})">
+                    <div class="history-prompt">${item.prompt}</div>
+                    <div class="history-time">${new Date(item.timestamp).toLocaleString()}</div>
+                </div>
+            `).join('') : '<div class="history-item">No history available</div>';
+            
+            modal.style.display = 'flex';
+        } catch (error) {
+            console.error('Failed to load history:', error);
+        }
+    }
+    
+    function loadHistoryItem(prompt, website) {
+        if (!website) {
+            console.error('No website content provided');
+            return;
+        }
+        
+        closeHistory();
+        const loading = document.querySelector('.loading');
+        const container = document.querySelector('.container');
+        
+        loading.style.display = 'flex';
+        setTimeout(() => loading.classList.add('visible'), 10);
+        container.style.display = 'none';
+        
+        setTimeout(() => {
+            document.open();
+            document.write(website);
+            document.close();
+        }, 300);
+    }
     </script>
     <footer class="footer">
         <p>Powered by <a href="https://gemini.google.com"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Google_Gemini_logo.svg/1200px-Google_Gemini_logo.svg.png" alt="Google Gemini Logo"></a></p>
