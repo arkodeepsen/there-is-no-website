@@ -9,7 +9,7 @@ This project generates a new website based on user prompts. There is no predefin
 - No third-party dependencies for generated websites.
 
 ## How to Use
-1. Visit the [homepage](https://there-is-no-website-bwwl75a8j-arkodeep-sens-projects.vercel.app/).
+1. Visit the [homepage](https://there-is-no-website-blond.vercel.app/).
 2. Enter a prompt describing the type of website you want.
 3. Click "Generate" to create your unique website.
 
