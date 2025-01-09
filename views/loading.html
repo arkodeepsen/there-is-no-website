@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>There is no title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Arial', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #3498db;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a, .theme-toggle {
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 5px;
+        }
+
+        .nav-links a:hover, .theme-toggle:hover {
+            color: #3498db;
+            text-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-prompt {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header h2 {
+            color: white;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .close-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px;
+        }
+
+        .history-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .history-item:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 60px;
+            height: calc(100vh - 140px);
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .glass2 {
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .glass:hover {
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            width: 350px;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        button {
+            min-width: 150px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+        }
+
+        button:hover {
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.6);
+        }
+
+        button i {
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(15, 12, 41, 0.95);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading.visible {
+            opacity: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            color: white;
+            font-size: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer img {
+            width: 40px;
+            height: auto;
+            vertical-align: middle;
+            transform: translateY(-3px);
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-brand {
+                font-size: 1.2rem;
+            }
+
+            .nav-brand i {
+                font-size: 1.5rem;
+            }
+
+            .nav-links a, .theme-toggle {
+                font-size: 1rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .input-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+        
+            input {
+                width: 100%;
+            }
+        
+            button {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .modal-content {
+                width: 90%;
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-brand {
+                font-size: 1rem;
+            }
+
+            .nav-brand i {
+                font-size: 1.2rem;
+            }
+
+            .nav-links a, .theme-toggle {
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .input-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            input {
+                width: 100%;
+                max-width: none;
+            }
+
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar glass2">
+        <div class="nav-brand">
+            <i class="fas fa-code"></i>
+            <span>I'm not a frontend developer</span>
+        </div>
+        <div class="nav-links">
+            <!--<a href="javascript:void(0)" onclick="showHistory()" class="history-btn" title="Show History">
+                <i class="fas fa-history"></i>
+            </a>-->
+            <a href="https://github.com/arkodeepsen/there-is-no-website" target="_blank" rel="noopener" title="GitHub Repository"><i class="fab fa-github"></i></a>
+        </div>
+    </nav>
+    <div id="historyModal" class="modal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>Generation History</h2>
+                <a href="javascript:void(0)" onclick="closeHistory()" class="close-btn" title="Close History">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+            <div class="history-list"></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="glass">
+            <h1>There is no website</h1>
+            <div class="input-container">
+                <input type="text" id="prompt" placeholder="unless you want one...">
+                <button type="button" onclick="generateWebsite()">
+                    <i class="fas fa-magic"></i>
+                    Generate
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="loading">
+        <div class="spinner"></div>
+        <p class="status">Generating your unique website...</p>
+    </div>
+    <script>
+        const generateWebsite = async () => {
+            const promptInput = document.getElementById('prompt');
+            if (!promptInput.value.trim()) {
+                alert('Please enter what kind of website you want to generate');
+                return;
+            }
+            const loading = document.querySelector('.loading');
+            const container = document.querySelector('.container');
+            
+            try {
+                loading.style.display = 'flex';
+                // Add small delay to ensure display:flex is applied before adding visible class
+                setTimeout(() => loading.classList.add('visible'), 10);
+                container.style.display = 'none';
+                
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: promptInput.value })
+                });
+                
+                if (!response.ok) throw new Error('Generation failed');
+                const html = await response.text();
+                document.open();
+                document.write(html);
+                document.close();
+            } catch (error) {
+                console.error('Error:', error);
+                loading.classList.remove('visible');
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    container.style.display = 'flex';
+                }, 300);
+                alert('Generation failed. Please try again.');
+            }
+        };
+    </script>
+    <script>
+    async function showHistory() {
+        const modal = document.getElementById('historyModal');
+        const historyList = document.querySelector('.history-list');
+        
+        try {
+            const response = await fetch('/history');
+            if (!response.ok) throw new Error('Failed to fetch history');
+            
+            const history = await response.json();
+            
+            historyList.innerHTML = history.length ? history.reverse().map(item => `
+                <div class="history-item" onclick="loadHistoryItem('${item.prompt}', ${JSON.stringify(item.website)})">
+                    <div class="history-prompt">${item.prompt}</div>
+                    <div class="history-time">${new Date(item.timestamp).toLocaleString()}</div>
+                </div>
+            `).join('') : '<div class="history-item">No history available</div>';
+            
+            modal.style.display = 'flex';
+        } catch (error) {
+            console.error('Failed to load history:', error);
+        }
+    }
+    
+    function loadHistoryItem(prompt, website) {
+        if (!website) {
+            console.error('No website content provided');
+            return;
+        }
+        
+        closeHistory();
+        const loading = document.querySelector('.loading');
+        const container = document.querySelector('.container');
+        
+        loading.style.display = 'flex';
+        setTimeout(() => loading.classList.add('visible'), 10);
+        container.style.display = 'none';
+        
+        setTimeout(() => {
+            document.open();
+            document.write(website);
+            document.close();
+        }, 300);
+    }
+    </script>
+    <footer class="footer">
+        <p>Powered by <a href="https://gemini.google.com"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Google_Gemini_logo.svg/1200px-Google_Gemini_logo.svg.png" alt="Google Gemini Logo"></a></p>
+        <p>Developed using no code with Claude Sonnet 3.5 by Arkodeep Sen.</p>
+    </footer>
+</body>
+</html>
