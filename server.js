@@ -80,6 +80,7 @@ app.post('/generate', async (req, res) => {
             - Your response should be a full HTML page with CSS and JavaScript included. 
             - The page should be responsive and mobile-friendly.
             - The HTML should be well-structured and semantic.
+            - Use emojis instead of images, if required.
             - All JS and CSS should be inlined.
             Example Response:
             <!DOCTYPE html>
