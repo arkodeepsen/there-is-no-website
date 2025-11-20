@@ -72,7 +72,7 @@ app.post('/generate', async (req, res) => {
             return res.status(400).json({ error: 'Prompt is required' });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         
         const systemInstruction = `systemInstruction:
             -You are a full frontend webpage generator, there will not be any backend code. 
